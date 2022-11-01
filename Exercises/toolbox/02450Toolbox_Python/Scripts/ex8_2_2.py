@@ -1,4 +1,9 @@
 # exercise 8.2.2
+
+import sys
+import os
+sys.path.insert(0, '02450/Exercises/toolbox/02450Toolbox_Python/Tools')
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.io import loadmat
@@ -8,7 +13,7 @@ import torch
 plt.rcParams.update({'font.size': 12})
 
 # read XOR DATA from matlab datafile
-mat_data = loadmat('../Data/xor.mat')
+mat_data = loadmat('C:/Users/guzma/OneDrive/Documents/TEC/DTU/02450/Exercises/toolbox/02450Toolbox_Python/Data/xor.mat')
 X = mat_data['X']
 y = mat_data['y']
 
@@ -39,7 +44,7 @@ color_list = ['tab:orange', 'tab:green', 'tab:purple', 'tab:brown', 'tab:pink',
               'tab:gray', 'tab:olive', 'tab:cyan', 'tab:red', 'tab:blue']
 
 # Define the model structure
-n_hidden_units = 1 # number of hidden units in the signle hidden layer
+n_hidden_units = 10 # number of hidden units in the signle hidden layer
 # The lambda-syntax defines an anonymous function, which is used here to 
 # make it easy to make new networks within each cross validation fold
 model = lambda: torch.nn.Sequential(

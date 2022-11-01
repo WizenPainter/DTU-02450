@@ -1,11 +1,16 @@
 # exercise 8.3.1 Fit neural network classifiers using softmax output weighting
+import sys
+import os
+sys.path.insert(0, '02450/Exercises/toolbox/02450Toolbox_Python/Tools')
+
+
 from matplotlib.pyplot import figure, show, title
 from scipy.io import loadmat
 from toolbox_02450 import dbplotf, train_neural_net, visualize_decision_boundary
 import numpy as np
 import torch
 # Load Matlab data file and extract variables of interest
-mat_data = loadmat('../Data/synth1.mat')
+mat_data = loadmat('C:/Users/guzma/OneDrive/Documents/TEC/DTU/02450/Exercises/toolbox/02450Toolbox_Python/Data/synth1.mat')
 X = mat_data['X']
 X = X - np.ones((X.shape[0],1)) * np.mean(X,0)
 X_train = mat_data['X_train']
@@ -22,7 +27,7 @@ C = len(classNames)
 #%% Model fitting and prediction
 
 # Define the model structure
-n_hidden_units = 5 # number of hidden units in the signle hidden layer
+n_hidden_units = 10 # number of hidden units in the signle hidden layer
 model = lambda: torch.nn.Sequential(
                             torch.nn.Linear(M, n_hidden_units), #M features to H hiden units
                             torch.nn.ReLU(), # 1st transfer function

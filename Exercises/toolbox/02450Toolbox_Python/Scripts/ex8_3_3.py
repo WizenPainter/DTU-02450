@@ -1,4 +1,9 @@
 # exercise 8.3.3 Fit regularized multinomial regression
+import sys
+import os
+sys.path.insert(0, '02450/Exercises/toolbox/02450Toolbox_Python/Tools')
+
+
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
 from toolbox_02450 import dbplotf, train_neural_net, visualize_decision_boundary
@@ -6,7 +11,7 @@ import numpy as np
 import sklearn.linear_model as lm
 
 # Load Matlab data file and extract variables of interest
-mat_data = loadmat('../Data/synth2.mat')
+mat_data = loadmat('C:/Users/guzma/OneDrive/Documents/TEC/DTU/02450/Exercises/toolbox/02450Toolbox_Python/Data/synth2.mat')
 X = mat_data['X']
 X_train = mat_data['X_train']
 X_test = mat_data['X_test']

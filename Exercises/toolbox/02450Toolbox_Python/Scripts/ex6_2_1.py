@@ -1,13 +1,16 @@
 # exercise 6.2.1
+import sys
+sys.path.insert(0, '02450/Exercises/toolbox/02450Toolbox_Python/Tools')
 from matplotlib.pyplot import figure, plot, subplot, title, xlabel, ylabel, show, clim
 from scipy.io import loadmat
 import sklearn.linear_model as lm
 from sklearn import model_selection
 from toolbox_02450 import feature_selector_lr, bmplot
+# import feature_selector_lr, bmplot
 import numpy as np
 
 # Load data from matlab file
-mat_data = loadmat('../Data/body.mat')
+mat_data = loadmat('02450/Exercises/toolbox/02450Toolbox_Python/Data/body.mat')
 X = mat_data['X']
 y = mat_data['y'].squeeze()
 attributeNames = [name[0] for name in mat_data['attributeNames'][0]]
@@ -74,19 +77,19 @@ for train_index, test_index in CV.split(X):
     print('Cross validation fold {0}/{1}'.format(k+1,K))
     print('Train indices: {0}'.format(train_index))
     print('Test indices: {0}'.format(test_index))
-    print('Features no: {0}\n'.format(selected_features.size))
+    print('Features no: {0}/n'.format(selected_features.size))
 
     k+=1
 
 
 # Display results
-print('\n')
-print('Linear regression without feature selection:\n')
+print('/n')
+print('Linear regression without feature selection:/n')
 print('- Training error: {0}'.format(Error_train.mean()))
 print('- Test error:     {0}'.format(Error_test.mean()))
 print('- R^2 train:     {0}'.format((Error_train_nofeatures.sum()-Error_train.sum())/Error_train_nofeatures.sum()))
 print('- R^2 test:     {0}'.format((Error_test_nofeatures.sum()-Error_test.sum())/Error_test_nofeatures.sum()))
-print('Linear regression with feature selection:\n')
+print('Linear regression with feature selection:/n')
 print('- Training error: {0}'.format(Error_train_fs.mean()))
 print('- Test error:     {0}'.format(Error_test_fs.mean()))
 print('- R^2 train:     {0}'.format((Error_train_nofeatures.sum()-Error_train_fs.sum())/Error_train_nofeatures.sum()))
@@ -107,7 +110,7 @@ ylabel('Attribute')
 f=2 # cross-validation fold to inspect
 ff=Features[:,f-1].nonzero()[0]
 if len(ff) == 0:
-    print('\nNo features were selected, i.e. the data (X) in the fold cannot describe the outcomes (y).' )
+    print('/nNo features were selected, i.e. the data (X) in the fold cannot describe the outcomes (y).' )
 else:
     m = lm.LinearRegression(fit_intercept=True).fit(X[:,ff], y)
     

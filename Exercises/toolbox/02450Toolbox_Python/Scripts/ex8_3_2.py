@@ -1,4 +1,8 @@
 # exercise 8.3.2 Fit multinomial regression
+import sys
+import os
+sys.path.insert(0, '02450/Exercises/toolbox/02450Toolbox_Python/Tools')
+
 from matplotlib.pyplot import figure, show, title
 from scipy.io import loadmat
 from toolbox_02450 import dbplotf, train_neural_net, visualize_decision_boundary
@@ -6,7 +10,7 @@ import numpy as np
 import sklearn.linear_model as lm
 
 # Load Matlab data file and extract variables of interest
-mat_data = loadmat('../Data/synth1.mat')
+mat_data = loadmat('C:/Users/guzma/OneDrive/Documents/TEC/DTU/02450/Exercises/toolbox/02450Toolbox_Python/Data/synth1.mat')
 X = mat_data['X']
 X = X - np.ones((X.shape[0],1)) * np.mean(X,0)
 X_train = mat_data['X_train']

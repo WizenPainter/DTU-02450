@@ -1,8 +1,11 @@
 # exercise 3.1.5
 import numpy as np
 import scipy.linalg as linalg
-from toolbox_02450.similarity import similarity
+import sys
+import os
 
+sys.path.append(os.path.abspath('C:/Users/guzma/OneDrive/Documents/TEC/DTU/02450/Exercises/toolbox/02450Toolbox_Python/Tools/toolbox_02450/'))
+from similarity import similarity
 from ex3_1_4 import *
 
 # Query vector
@@ -29,7 +32,7 @@ sim = similarity(X, q, 'cos');
 
 
 # Display the result
-print('Query vector:\n {0}\n'.format(q))
-print('Similarity results:\n {0}'.format(sim))
+print('Query vector:/n {0}/n'.format(q))
+print('Similarity results:/n {0}'.format(sim))
 
 print('Ran Exercise 3.1.5')

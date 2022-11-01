@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 # Load the Iris csv data using the Pandas library
-filename = '../Data/iris.csv'
+filename = '02450/Exercises/toolbox/02450Toolbox_Python/Data/iris.csv'
 df = pd.read_csv(filename)
 
 # Pandas returns a dataframe, (df) which could be used for handling the data.

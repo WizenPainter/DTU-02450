@@ -1,5 +1,8 @@
 # exercise 6.3.1
 
+import sys
+sys.path.insert(0, '02450/Exercises/toolbox/02450Toolbox_Python/')
+
 from matplotlib.pyplot import (figure, plot, title, xlabel, ylabel, 
                                colorbar, imshow, xticks, yticks, show)
 from scipy.io import loadmat
@@ -8,7 +11,7 @@ from sklearn.metrics import confusion_matrix
 from numpy import cov
 
 # Load Matlab data file and extract variables of interest
-mat_data = loadmat('../Data/synth1.mat') # <-- change the number to change dataset
+mat_data = loadmat('02450/Exercises/toolbox/02450Toolbox_Python/Data/synth1.mat') # <-- change the number to change dataset
 X = mat_data['X']
 X_train = mat_data['X_train']
 X_test = mat_data['X_test']

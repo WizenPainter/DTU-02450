@@ -1,4 +1,9 @@
 # exercise 8.1.1
+import sys
+import os
+
+# sys.path.append(os.path.abspath('C:/Users/guzma/OneDrive/Documents/TEC/DTU/02450/Exercises/toolbox/02450Toolbox_Python/Tools/toolbox_02450'))
+sys.path.insert(0, '02450/Exercises/toolbox/02450Toolbox_Python/Tools')
 
 from matplotlib.pylab import (figure, semilogx, loglog, xlabel, ylabel, legend, 
                            title, subplot, show, grid)
@@ -8,7 +13,8 @@ import sklearn.linear_model as lm
 from sklearn import model_selection
 from toolbox_02450 import rlr_validate
 
-mat_data = loadmat('../Data/body.mat')
+mat_data = loadmat('C:/Users/guzma/OneDrive/Documents/TEC/DTU/02450/Exercises/toolbox/02450Toolbox_Python/Data/body.mat')
+print(mat_data['X'])
 X = mat_data['X']
 y = mat_data['y'].squeeze()
 attributeNames = [name[0] for name in mat_data['attributeNames'][0]]
@@ -110,7 +116,7 @@ for train_index, test_index in CV.split(X,y):
     # To inspect the used indices, use these print statements
     #print('Cross validation fold {0}/{1}:'.format(k+1,K))
     #print('Train indices: {0}'.format(train_index))
-    #print('Test indices: {0}\n'.format(test_index))
+    #print('Test indices: {0}/n'.format(test_index))
 
     k+=1
 
@@ -120,12 +126,12 @@ print('Linear regression without feature selection:')
 print('- Training error: {0}'.format(Error_train.mean()))
 print('- Test error:     {0}'.format(Error_test.mean()))
 print('- R^2 train:     {0}'.format((Error_train_nofeatures.sum()-Error_train.sum())/Error_train_nofeatures.sum()))
-print('- R^2 test:     {0}\n'.format((Error_test_nofeatures.sum()-Error_test.sum())/Error_test_nofeatures.sum()))
+print('- R^2 test:     {0}/n'.format((Error_test_nofeatures.sum()-Error_test.sum())/Error_test_nofeatures.sum()))
 print('Regularized linear regression:')
 print('- Training error: {0}'.format(Error_train_rlr.mean()))
 print('- Test error:     {0}'.format(Error_test_rlr.mean()))
 print('- R^2 train:     {0}'.format((Error_train_nofeatures.sum()-Error_train_rlr.sum())/Error_train_nofeatures.sum()))
-print('- R^2 test:     {0}\n'.format((Error_test_nofeatures.sum()-Error_test_rlr.sum())/Error_test_nofeatures.sum()))
+print('- R^2 test:     {0}/n'.format((Error_test_nofeatures.sum()-Error_test_rlr.sum())/Error_test_nofeatures.sum()))
 
 print('Weights in last fold:')
 for m in range(M):
