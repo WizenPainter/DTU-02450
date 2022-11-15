@@ -915,33 +915,6 @@ print('p3: ', p3)
 # Do one hot encoding for y *maybe
 
 # %%
-model = lambda: torch.nn.Sequential(
-                    torch.nn.Linear(13, 6),
-                    torch.nn.ReLU(),
-                    torch.nn.Linear(6, 5), #M features to H hiden units # H hidden units to 1 output neuron
-                    torch.nn.Softmax(dim=1) # final tranfer function # TODO maybe change to ReLU 
-                    )
-net = model()
-loss_fn = torch.nn.CrossEntropyLoss()
-torch.nn.init.xavier_uniform_(net[0].weight)
-torch.nn.init.xavier_uniform_(net[2].weight)
-optimizer = torch.optim.Adam(net.parameters())
-CV2 = KFold(K,shuffle=True)
-for k, (train_index, validation_index) in enumerate(CV2.split(partition_index)):
-    X_train = torch.Tensor(X[train_index,:])
-    X_train = torch.squeeze(X_train)
-    y_train = torch.tensor(y.iloc[train_index].to_numpy(), dtype=torch.long)
-    # torch.tensor(y_train, dtype=torch.long)
-    # print(y_train)
-    # y_train = torch.Tensor(y.iloc[train_index].to_numpy())
-    # print(X_train.size())
-    y_Est = net(X_train)
-    y_Est = y_Est.view(X_train.shape[0],-1)
-    print(y_Est.size())
-    print(y_train.size())
-    loss_fn(y_Est, y_train)
-
-# %%
 from sklearn.model_selection import KFold
 import torch
 K = 10
@@ -1059,16 +1032,16 @@ for k, (partition_index, test_index) in enumerate(CV.split(X,y)):
     summaries_axes[0].set_title('Learning curves')
     
 # Display the error rate across folds
-# summaries_axes[1].bar(np.arange(1, K+1), np.squeeze(np.asarray(errors_easy)), color=color_list)
-# summaries_axes[1].set_xlabel('Fold');
-# summaries_axes[1].set_xticks(np.arange(1, K+1))
-# summaries_axes[1].set_ylabel('Error rate');
-# summaries_axes[1].set_title('Test misclassification rates')
+summaries_axes[1].bar(np.arange(1, K+1), np.squeeze(np.asarray(errors_easy)), color=color_list)
+summaries_axes[1].set_xlabel('Fold');
+summaries_axes[1].set_xticks(np.arange(1, K+1))
+summaries_axes[1].set_ylabel('Error rate');
+summaries_axes[1].set_title('Test misclassification rates')
     
 # # Show the plots
-# plt.show(decision_boundaries.number) # try these lines if the following code fails (depends on package versions)
-# plt.show(summaries.number)
-# plt.show()
+plt.show(decision_boundaries.number) # try these lines if the following code fails (depends on package versions)
+plt.show(summaries.number)
+plt.show()
 
 # # Display a diagram of the best network in last fold
 # print('Diagram of best neural net in last fold:')
@@ -1100,66 +1073,188 @@ new_y = y.to_numpy()
 X = X_scaled
 K = 10
 CV = KFold(K,shuffle=True, random_state=seed)
-for k, (train_index, test_index) in enumerate(CV.split(X,new_y)):
-    X_train = X[train_index,:]
-    y_train = new_y[train_index]
+for k, (partition_index, test_index) in enumerate(CV.split(X,new_y)):
     X_test = X[test_index,:]
     y_test = new_y[test_index]
 
-    lambdas = np.power(10.,range(-5,9))
-    opt_val_err, opt_lambda, mean_w_vs_lambda, train_err_vs_lambda, test_err_vs_lambda = rlr_validate(X_train, y_train, lambdas)
+    CV2 = KFold(K, shuffle=True, random_state=seed)
+    for k, (train_index, validation_index) in enumerate(CV2.split(X_train,y_train)):
 
-    # lambda_interval = np.linspace(-8, 2, 10)
-    lambda_interval = np.logspace(-8, 2, 29)
+        X_train = X[train_index,:]
+        y_train = new_y[train_index]
+        X_validation = X[validation_index,:]
+        y_validation = new_y[validation_index]
 
-    Error_train_sm = np.empty((len(X_train),1))
-    Error_test_sm = np.empty((len(X_test),1))
+        lambdas = np.power(10.,range(-5,9))
+        opt_val_err, opt_lambda, mean_w_vs_lambda, train_err_vs_lambda, test_err_vs_lambda = rlr_validate(X_train, y_train, lambdas)
 
-    train_error_rate = np.zeros(len(lambda_interval))
-    test_error_rate = np.zeros(len(lambda_interval))
-    coefficient_norm = np.zeros(len(lambda_interval))
-    print(len(lambda_interval))
-    for j in range(0, len(lambda_interval)):
-        # mdl = LinearRegression()
-        mdl = LogisticRegression(penalty='l2', C=1/opt_lambda)
-        # mdl = Ridge(alpha = opt_lambda)
-        
-        mdl.fit(X_train, y_train)
+        # lambda_interval = np.linspace(-8, 2, 10)
+        lambda_interval = np.logspace(-8, 2, 29)
 
-        y_train_est = mdl.predict(X_train).T
-        y_test_est = mdl.predict(X_test).T
+        Error_train_sm = np.empty((len(X_train),1))
+        Error_val_sm = np.empty((len(X_validation),1))
+        Error_test_sm = np.empty((len(X_test),1))
 
-        Error_train_sm[j] = np.square(y_train-mdl.predict(X_train)).sum()/y_train.shape[0]
-        Error_test_sm[j] = np.square(y_test-mdl.predict(X_test)).sum()/y_test.shape[0]
-        
-        train_error_rate[j] = np.sum(y_train_est != y_train) / len(y_train)
-        test_error_rate[j] = np.sum(y_test_est != y_test) / len(y_test)
+        train_error_rate = np.zeros(len(lambda_interval))
+        validation_error_rate = np.zeros(len(lambda_interval))
+        test_error_rate = np.zeros(len(lambda_interval))
+        coefficient_norm = np.zeros(len(lambda_interval))
+        print(len(lambda_interval))
+        for j in range(0, len(lambda_interval)):
 
-        w_est = mdl.coef_[0] 
-        coefficient_norm[j] = np.sqrt(np.sum(w_est**2))
+            # mdl = LinearRegression()
+            mdl = LogisticRegression(penalty='l2', C=1/opt_lambda)
+            # mdl = Ridge(alpha = opt_lambda)
+            
+            mdl.fit(X_train, y_train)
+
+            y_train_est = mdl.predict(X_train).T
+            y_val_est = mdl.predict(X_validation)
+
+            Error_train_sm[j] = np.square(y_train-mdl.predict(X_train)).sum()/y_train.shape[0]
+            # Error_val_sm[j] = np.square(y_validation-mdl.predict(X_validation)).sum()/y_validation.shape[0]
+
+            
+            train_error_rate[j] = np.sum(y_train_est != y_train) / len(y_train)
+            validation_error_rate[j] = np.sum(y_val_est != y_validation) / len(y_validation)
+
+            w_est = mdl.coef_[0] 
+            coefficient_norm[j] = np.sqrt(np.sum(w_est**2))
+
+    y_test_est = mdl.predict(X_test).T
+    Error_test_sm[j] = np.square(y_test-mdl.predict(X_test)).sum()/y_test.shape[0]
+    test_error_rate[j] = np.sum(y_test_est != y_test) / len(y_test)
 
 
 # %% [markdown]
 # ### BaseLine model
 
 # %%
-baseline_train_error_array = []
-baseline_test_error_array = []
-baseline_test2_error_array = []
-CV = KFold(K,shuffle=True)
-for k, (train_index, test_index) in enumerate(CV.split(X,y)):
-    baseline_train_error = np.square(y.iloc[train_index] - y.iloc[train_index].mean()).sum(axis=0)/ y.shape[0]
-    baseline_test_error = np.square(y.iloc[test_index] - y.iloc[test_index].mean()).sum(axis=0)/ y.shape[0]
-    baseline_test_error2 = np.square(y.iloc[test_index] - y.iloc[train_index].mean()).sum(axis=0)/ y.shape[0] # TA recommended
-    print(f'The baseline training MSE is {baseline_train_error}')
-    print(f'The baseline test MSE is {baseline_test_error}')
-    print(f'The baseline test2 MSE is {baseline_test_error2} \n', '-'*50)
-    baseline_train_error_array.append(baseline_train_error)
-    baseline_test_error_array.append(baseline_test_error)
-    baseline_test2_error_array.append(baseline_test_error2)
+k = 0
+y = new_y
+gen_error_log = np.zeros(10)
+gen_error_base = np.zeros(10)
+gen_error_tree = np.zeros(10)
+lambda_log_interval = np.logspace(-5, 1, 10)
+for par_index, test_index in CV.split(X, y):
+    #Extract paring and test set for current CV fold
+    X_par = X[par_index]
+    y_par = y[par_index]
+    X_test = X[test_index]
+    y_test = y[test_index]
+    
+    y_val_error_log = np.zeros(10)
+    y_val_error_base = np.zeros(10)
+    y_val_error_tree = np.zeros(10)
+    
+    i=0
+    CV_2 = KFold(10, shuffle=True)
+    
+    #Inner loop
+    for train_index, val_index in CV_2.split(X_par):
+        #Extract train and validation set for current inner fold
+        X_train = X_par[train_index]
+        y_train = y_par[train_index]
+        X_val = X_par[val_index]
+        y_val = y_par[val_index]
+        
+        ###### Logistic ######
+        logistic = LogisticRegression(penalty='l2', C=1/lambda_log_interval[k])
+        logistic.fit(X_train,y_train)
+        y_val_est_log = logistic.predict(X_val)
+        y_val_error_log[i] = np.sum(y_val_est_log != y_val) / len(y_val)
+        
+        
+        ###### Baseline ######
+        spamOccur = np.count_nonzero(y_train == 1)
+        notSpamOccur = np.count_nonzero(y_train == 0)
+        
+        if (spamOccur >= notSpamOccur):
+            c = 1
+            
+        elif (spamOccur < notSpamOccur):
+            c = 0
+        
+        baselineY = np.full(len(y_val), c)
+        
+        errorCount = 0
+        for l in range(len(y_val)):
+            if (baselineY[l] != y_val[l]):
+                errorCount = errorCount + 1
+        
+        y_val_error_base[i] = errorCount/len(y_val)
+
+    gen_error_log[k] = np.mean(y_val_error_log)
+    gen_error_base[k] = np.mean(y_val_error_base)
+    
+    best_log = np.argmin(y_val_error_log)
+    k += 1
+    
+    #############################
+    #Statistical evaluation runs#
+    #############################
+    
+    #Baseline
+    spamOccur = np.count_nonzero(y_par == 1)
+    notSpamOccur = np.count_nonzero(y_par == 0)
+    
+    if (spamOccur >= notSpamOccur):
+        c = 1
+        
+    elif (spamOccur < notSpamOccur):
+        c = 0
+    
+    yhatA = np.full(len(y_test), c)
+    
+    #Logistic regression
+    logStat = LogisticRegression(penalty='l2', C=1/lambda_log_interval[best_log])
+    logStat.fit(X_par,y_par)
+    yhatB = logistic.predict(X_test)
+
+# complexParam = np.array([10, 120, 230, 340, 450, 560, 670, 780, 890, 1000])
+# table = np.c_[np.arange(1,11), complexParam, lambda_log_interval, gen_error_log, gen_error_base]
+# table = pd.DataFrame(table, columns = ['Outer fold', 'Complexity parameter', 'Regularization strength', 'Error_logistic', 'Error_baseline', 'error_ann'])
+
+# %%
+ann_error = np.array([])
+for i in errors_easy:
+    ann_error = np.append((np.mean(i)),ann_error)
+
+# %%
+ann_error
+
+# %%
+table = np.c_[np.arange(1,11), lambda_log_interval, gen_error_log, gen_error_base, ann_error]
+table = pd.DataFrame(table, columns = ['Outer fold', 'Regularization strength', 'Error_logistic', 'Error_baseline', 'Error_ann'])
+
+# %%
+table.head(10)
 
 # %% [markdown]
 # ### McNemar Test
+
+# %%
+log_clas_error = Error_test_sm[-11:-1]
+log_clas_error = log_clas_error.squeeze()
+
+# %%
+table = np.c_[gen_error_log, gen_error_base, ann_error]
+table = pd.DataFrame(table, columns = ['Error_logistic', 'Error_baseline', 'Error_ann'])
+
+# %%
+table
+
+# %%
+data = [gen_error_log, gen_error_base, ann_error]
+
+# %%
+from statsmodels.stats.contingency_tables import mcnemar
+
+#McNemar's Test with no continuity correction
+print(mcnemar(data, exact=False))
+
+#McNemar's Test with continuity correction
+print('\n',mcnemar(data, exact=False, correction=False))
 
 # %% [markdown]
 # ### Model
